@@ -2,17 +2,18 @@ package com.back;
 
 import com.back.domain.system.controller.SystemController;
 import com.back.domain.wiseSaying.controller.WiseSayingController;
-import com.back.domain.wiseSaying.repository.WiseSayingFileRepository;
+import com.back.domain.wiseSaying.repository.WiseSayingDbRepository;
 import com.back.domain.wiseSaying.repository.WiseSayingRepository;
 import com.back.domain.wiseSaying.service.WiseSayingService;
+import com.back.global.db.DbConfig;
 
 import java.nio.file.Path;
 import java.util.Scanner;
 
 public class App {
 
-    // 실제 실행(Main)에서 명언을 저장하는 폴더
-    public static final Path DB_DIR = Path.of("db", "wiseSaying");
+    // 실제 실행(Main)에서 빌드 결과(data.json)를 쓰는 폴더
+    public static final Path BUILD_DIR = Path.of("db", "wiseSaying");
 
     private static final int SAMPLE_COUNT = 10;
 
@@ -20,19 +21,19 @@ public class App {
     private final SystemController systemController;
     private final WiseSayingController wiseSayingController;
 
-    // 실제 실행(Main): db/wiseSaying 을 쓰고, 샘플 명언은 만들지 않는다.
+    // 실제 실행(Main): 개발 DB(dev)를 쓰고, 샘플 명언은 만들지 않는다.
     public App(Scanner sc) {
-        this(sc, DB_DIR, false);
+        this(sc, DbConfig.load("dev"), BUILD_DIR, false);
     }
 
-    // 테스트는 dbDir 에 테스트 전용 폴더를 넘긴다.
-    // 검색·페이징 테스트는 makeSampleData = true 로, 폴더가 비어 있으면 샘플 10개를 만들고 시작한다.
-    public App(Scanner sc, Path dbDir, boolean makeSampleData) {
+    // 테스트는 테스트 DB 접속 정보와 테스트 전용 빌드 폴더를 넘긴다.
+    // 검색·페이징 테스트는 makeSampleData = true 로, 테이블이 비어 있으면 샘플 10개를 만들고 시작한다.
+    public App(Scanner sc, DbConfig dbConfig, Path buildDir, boolean makeSampleData) {
         this.sc = sc;
 
-        // 바뀐 곳은 이 한 줄뿐: 메모리 저장소 대신 파일 저장소를 만들어 넘긴다.
+        // 15단계에서 바뀐 곳: 파일 저장소 대신 MySQL 저장소를 만들어 넘긴다.
         // 서비스·컨트롤러는 WiseSayingRepository 인터페이스만 알기 때문에 고칠 필요가 없다.
-        WiseSayingRepository wiseSayingRepository = new WiseSayingFileRepository(dbDir);
+        WiseSayingRepository wiseSayingRepository = new WiseSayingDbRepository(dbConfig, buildDir);
         WiseSayingService wiseSayingService = new WiseSayingService(wiseSayingRepository);
 
         if (makeSampleData) {

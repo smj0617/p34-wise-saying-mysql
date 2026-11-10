@@ -1,0 +1,3 @@
+# 이 파일을 db.local.properties 로 복사한 뒤 값을 채운다. (db.local.properties 는 .gitignore 대상)
+# 환경변수 DB_PASSWORD 를 쓰면 이 파일은 없어도 된다.
+db.password=

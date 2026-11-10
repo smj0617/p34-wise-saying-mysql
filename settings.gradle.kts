@@ -1,1 +1,1 @@
-rootProject.name = "p32-wise-saying-file"
+rootProject.name = "p34-wise-saying-mysql"
